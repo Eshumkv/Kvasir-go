@@ -1,7 +1,6 @@
 package ecs
 
 import (
-	"fmt"
 	"sort"
 )
 
@@ -65,7 +64,6 @@ func (mngr *SystemManager) AddSystem(s System, t SystemType) {
 		mngr.renderSystems = append(mngr.renderSystems, s)
 		sort.Sort(byPriority(mngr.renderSystems))
 	}
-	fmt.Println(mngr.beforeUpdateSystems)
 
 	count := len(mngr.beforeUpdateSystems) +
 		len(mngr.updateSystems) + len(mngr.renderSystems)
@@ -81,10 +79,6 @@ func (mngr *SystemManager) AddSystem(s System, t SystemType) {
 
 	for _, system := range mngr.renderSystems {
 		mngr.allSystems = append(mngr.allSystems, system)
-	}
-
-	for _, s := range mngr.allSystems {
-		fmt.Println(s)
 	}
 }
 

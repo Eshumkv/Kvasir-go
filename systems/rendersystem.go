@@ -7,6 +7,7 @@ import (
 
 	"github.com/eshumkv/Kvasir-go/components"
 	"github.com/eshumkv/Kvasir-go/ecs"
+	"github.com/eshumkv/Kvasir-go/parts"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -14,6 +15,7 @@ import (
 type RenderSystem struct {
 	renderer *sdl.Renderer
 	entities []ecs.Entity
+	camera   parts.CameraInterface
 }
 
 // NewRenderSystem returns a pointer to a new RenderSystem.
@@ -42,10 +44,12 @@ func (s *RenderSystem) Update(dt float64) {
 			continue
 		}
 		rect := entity.Rect()
+		sx, sy := s.camera.GetScreenLocation(float64(rect.X), float64(rect.Y))
+		toDraw := sdl.Rect{int32(sx), int32(sy), entity.W(), entity.H()}
 
 		r, g, b, _, _ := s.renderer.GetDrawColor()
 		s.renderer.SetDrawColor(comp.R, comp.G, comp.B, 255)
-		s.renderer.FillRect(&rect)
+		s.renderer.FillRect(&toDraw)
 		s.renderer.SetDrawColor(r, g, b, 255)
 	}
 }
@@ -70,13 +74,15 @@ func (s RenderSystem) Priority() uint {
 }
 
 // HandleMessage handles any messages that need to be dealt with.
-func (s RenderSystem) HandleMessage(msg ecs.Message, data interface{}) {
+func (s *RenderSystem) HandleMessage(msg ecs.Message, data interface{}) {
 	switch msg {
 	case MessageGeneric:
 		d := data.(string)
 		fmt.Println(d)
 		comp, _ := getColorComponent(&s.entities[0])
 		comp.R += 10
+	case MessageCameraUpdate:
+		s.camera = data.(parts.CameraInterface)
 	}
 }
 

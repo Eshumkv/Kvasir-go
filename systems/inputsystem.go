@@ -2,19 +2,20 @@ package systems
 
 import (
 	"github.com/eshumkv/Kvasir-go/ecs"
+	"github.com/eshumkv/Kvasir-go/parts"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 // InputSystem defines the system to process input.
 type InputSystem struct {
-	game     GameInterface
+	game     parts.GameInterface
 	entities []ecs.Entity
 	commands []bool
 	mgnr     *ecs.SystemManager
 }
 
 // NewInputSystem returns a pointer to a new InputSystem.
-func NewInputSystem(game GameInterface) *InputSystem {
+func NewInputSystem(game parts.GameInterface) *InputSystem {
 	return &InputSystem{
 		game:     game,
 		entities: make([]ecs.Entity, 0),
@@ -31,6 +32,10 @@ func (s *InputSystem) Init(mngr *ecs.SystemManager) {
 func (s *InputSystem) Add(e *ecs.Entity) {
 	s.entities = append(s.entities, *e)
 }
+
+// TODO: make the game go through the message queue as well
+// 		You know, ask the game to set it to fullscreen, so there's not so much
+// 		coupling.
 
 // Update handles the update of the system.
 func (s *InputSystem) Update(dt float64) {

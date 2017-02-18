@@ -1,4 +1,4 @@
-package systems
+package parts
 
 // GameInterface defines the interface that every game should follow.
 // Mostly used to decouple stuff so I can cyclic import :)
