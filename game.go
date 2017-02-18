@@ -15,6 +15,7 @@ type Game struct {
 	commands     []bool
 	isFullscreen bool
 	sManager     *ecs.SystemManager
+	rManager     *ecs.SystemManager
 }
 
 // NewGame creates a new game.
@@ -25,6 +26,7 @@ func NewGame(window *sdl.Window, renderer *sdl.Renderer) *Game {
 		IsRunning: true,
 		commands:  make([]bool, CommandCount),
 		sManager:  ecs.NewSystemManager(),
+		rManager:  ecs.NewSystemManager(),
 	}
 
 	// Init
@@ -95,13 +97,14 @@ func (game *Game) Update(dt float64) {
 // Render shows the gamestate on screen.
 func (game *Game) Render(lag float64) {
 	game.renderer.Clear()
+	game.rManager.Update(lag)
 	game.renderer.Present()
 }
 
 func (game *Game) setupSystems() {
-	game.sManager.AddSystem(NewRenderSystem(game.renderer))
+	game.rManager.AddSystem(NewRenderSystem(game.renderer))
 
-	for _, system := range game.sManager.Systems() {
+	for _, system := range game.rManager.Systems() {
 		switch system.(type) {
 		case *RenderSystem:
 			entity := ecs.NewEntity(0, 0, 50, 50).Add(NewColorComponent(50, 60, 200))

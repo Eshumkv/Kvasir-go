@@ -15,7 +15,7 @@ type RenderSystem struct {
 func NewRenderSystem(renderer *sdl.Renderer) *RenderSystem {
 	return &RenderSystem{
 		renderer: renderer,
-		entities: make([]ecs.Entity, 50),
+		entities: make([]ecs.Entity, 0),
 	}
 }
 
@@ -29,11 +29,18 @@ func (s *RenderSystem) Add(e *ecs.Entity) {
 
 func (s *RenderSystem) Update(dt float64) {
 	for _, entity := range s.entities {
-		comp, ok := entity.Get("ColorComponent")
+		genericComponent, ok := entity.Get("*kvasir.ColorComponent")
 		if !ok {
 			continue
 		}
-		fmt.Println(comp)
+		comp := genericComponent.(*ColorComponent)
+		rect := entity.Rect()
+		fmt.Println(rect)
+
+		r, g, b, _, _ := s.renderer.GetDrawColor()
+		s.renderer.SetDrawColor(comp.r, comp.g, comp.b, 255)
+		s.renderer.FillRect(&rect)
+		s.renderer.SetDrawColor(r, g, b, 255)
 	}
 }
 
