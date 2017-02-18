@@ -3,7 +3,9 @@ package kvasir
 import (
 	"fmt"
 
+	"github.com/eshumkv/Kvasir-go/components"
 	"github.com/eshumkv/Kvasir-go/ecs"
+	"github.com/eshumkv/Kvasir-go/systems"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -102,12 +104,13 @@ func (game *Game) Render(lag float64) {
 }
 
 func (game *Game) setupSystems() {
-	game.rManager.AddSystem(NewRenderSystem(game.renderer))
+	// Setup the render systems
+	game.rManager.AddSystem(systems.NewRenderSystem(game.renderer))
 
 	for _, system := range game.rManager.Systems() {
 		switch system.(type) {
-		case *RenderSystem:
-			entity := ecs.NewEntity(0, 0, 50, 50).Add(NewColorComponent(50, 60, 200))
+		case *systems.RenderSystem:
+			entity := ecs.NewEntity(0, 0, 50, 50).Add(components.NewColorComponent(50, 60, 200))
 			system.Add(entity)
 		}
 	}

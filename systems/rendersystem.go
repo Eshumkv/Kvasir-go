@@ -1,8 +1,9 @@
-package kvasir
+package systems
 
 import (
 	"fmt"
 
+	"github.com/eshumkv/Kvasir-go/components"
 	"github.com/eshumkv/Kvasir-go/ecs"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -29,16 +30,16 @@ func (s *RenderSystem) Add(e *ecs.Entity) {
 
 func (s *RenderSystem) Update(dt float64) {
 	for _, entity := range s.entities {
-		genericComponent, ok := entity.Get("*kvasir.ColorComponent")
+		genericComponent, ok := entity.Get("*components.ColorComponent")
 		if !ok {
 			continue
 		}
-		comp := genericComponent.(*ColorComponent)
+		comp := genericComponent.(*components.ColorComponent)
 		rect := entity.Rect()
 		fmt.Println(rect)
 
 		r, g, b, _, _ := s.renderer.GetDrawColor()
-		s.renderer.SetDrawColor(comp.r, comp.g, comp.b, 255)
+		s.renderer.SetDrawColor(comp.R, comp.G, comp.B, 255)
 		s.renderer.FillRect(&rect)
 		s.renderer.SetDrawColor(r, g, b, 255)
 	}
@@ -58,5 +59,5 @@ func (s *RenderSystem) Delete(e ecs.Entity) {
 }
 
 func (s RenderSystem) Priority() uint {
-	return 0
+	return 50
 }
