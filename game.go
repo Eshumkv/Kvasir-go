@@ -1,8 +1,6 @@
 package kvasir
 
 import (
-	"fmt"
-
 	"github.com/eshumkv/Kvasir-go/components"
 	"github.com/eshumkv/Kvasir-go/ecs"
 	"github.com/eshumkv/Kvasir-go/systems"
@@ -13,7 +11,7 @@ import (
 type Game struct {
 	window       *sdl.Window
 	renderer     *sdl.Renderer
-	IsRunning    bool
+	isRunning    bool
 	commands     []bool
 	isFullscreen bool
 	sManager     *ecs.SystemManager
@@ -25,8 +23,8 @@ func NewGame(window *sdl.Window, renderer *sdl.Renderer) *Game {
 	result := Game{
 		window:    window,
 		renderer:  renderer,
-		IsRunning: true,
-		commands:  make([]bool, CommandCount),
+		isRunning: true,
+		commands:  make([]bool, systems.CommandCount),
 		sManager:  ecs.NewSystemManager(),
 		rManager:  ecs.NewSystemManager(),
 	}
@@ -39,60 +37,8 @@ func NewGame(window *sdl.Window, renderer *sdl.Renderer) *Game {
 	return &result
 }
 
-// ProcessInput processes the input for the game.
-func (game *Game) ProcessInput() {
-	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-		switch t := event.(type) {
-		case *sdl.QuitEvent:
-			game.IsRunning = false
-		case *sdl.KeyDownEvent:
-			game.commands[toCommand(t.Keysym.Sym)] = true
-
-			if game.commands[CommandFullscreen] {
-				var flag uint32 = sdl.WINDOW_FULLSCREEN_DESKTOP
-
-				if game.isFullscreen {
-					flag = 0
-				}
-
-				game.isFullscreen = !game.isFullscreen
-				game.window.SetFullscreen(flag)
-				game.commands[CommandFullscreen] = false
-			}
-
-		case *sdl.KeyUpEvent:
-			game.commands[toCommand(t.Keysym.Sym)] = false
-		}
-	}
-}
-
-// toCommand turns an SDL2 keycode into a game command.
-func toCommand(keycode sdl.Keycode) Command {
-	switch keycode {
-	case sdl.K_F11:
-		return CommandFullscreen
-	case sdl.K_w:
-		return CommandUp
-	case sdl.K_s:
-		return CommandDown
-	case sdl.K_a:
-		return CommandLeft
-	case sdl.K_d:
-		return CommandRight
-	case sdl.K_SPACE:
-		return CommandShoot
-	case sdl.K_LSHIFT:
-		return CommandSpeedup
-	default:
-		return CommandNone
-	}
-}
-
 // Update updates the gamestate.
 func (game *Game) Update(dt float64) {
-	if game.commands[CommandLeft] {
-		fmt.Println("Yay")
-	}
 	game.sManager.Update(dt)
 }
 
@@ -101,6 +47,33 @@ func (game *Game) Render(lag float64) {
 	game.renderer.Clear()
 	game.rManager.Update(lag)
 	game.renderer.Present()
+}
+
+func (game *Game) IsRunning() bool {
+	return game.isRunning
+}
+
+func (game *Game) SetRunning(state bool) {
+	game.isRunning = state
+}
+
+func (game *Game) SetCommand(c systems.Command, state bool) {
+	game.commands[c] = state
+}
+
+func (game *Game) GetCommand(c systems.Command) bool {
+	return game.commands[c]
+}
+
+func (game *Game) ToggleFullscreen() {
+	var flag uint32 = sdl.WINDOW_FULLSCREEN_DESKTOP
+
+	if game.isFullscreen {
+		flag = 0
+	}
+
+	game.isFullscreen = !game.isFullscreen
+	game.window.SetFullscreen(flag)
 }
 
 func (game *Game) setupSystems() {
@@ -112,6 +85,14 @@ func (game *Game) setupSystems() {
 		case *systems.RenderSystem:
 			entity := ecs.NewEntity(0, 0, 50, 50).Add(components.NewColorComponent(50, 60, 200))
 			system.Add(entity)
+		}
+	}
+
+	// Setup the other systems
+	game.sManager.AddSystem(systems.NewInputSystem(game))
+	for _, system := range game.sManager.Systems() {
+		switch system.(type) {
+		case *systems.InputSystem:
 		}
 	}
 }

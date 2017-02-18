@@ -36,7 +36,7 @@ func NewEntity(x, y float64, w, h int32) *Entity {
 	return result
 }
 
-// ID returns the unique id of the entity.
+// ID returns the unique id of the entity. (identifier interface)
 func (e Entity) ID() uint64 {
 	return e.id
 }
@@ -84,46 +84,56 @@ func (e Entity) Has(comp string) bool {
 	return false
 }
 
+// X returns the x value of the entity.
 func (e *Entity) X() float64 {
 	return e.x
 }
 
+// SetX sets the x value of the entity.
 func (e *Entity) SetX(n float64) {
 	e.x = n
 	e.setRect()
 }
 
+// Y returns the y value of the entity.
 func (e *Entity) Y() float64 {
 	return e.x
 }
 
+// SetY sets the y value of the entity.
 func (e *Entity) SetY(n float64) {
 	e.y = n
 	e.setRect()
 }
 
+// W returns the width of the entity.
 func (e *Entity) W() int32 {
 	return e.w
 }
 
+// SetW sets the width of the entity.
 func (e *Entity) SetW(n int32) {
 	e.w = n
 	e.setRect()
 }
 
+// H returns the height of the entity.
 func (e *Entity) H() int32 {
 	return e.h
 }
 
+// SetH sets the height of the entity.
 func (e *Entity) SetH(n int32) {
 	e.h = n
 	e.setRect()
 }
 
+// Rect returns a (SDL) rectangle that defines this entity.
 func (e *Entity) Rect() sdl.Rect {
 	return e.rect
 }
 
+// setRect is a helper function to set the correct rectangle of this entity.
 func (e *Entity) setRect() {
 	e.rect = sdl.Rect{
 		X: int32(e.x),

@@ -13,14 +13,17 @@ type Priority interface {
 	Priority() uint
 }
 
+// byPriority helps to sort the systems by priority
 type byPriority []System
 
+// Len does something (sort function).
 func (s byPriority) Len() int {
 	return len(s)
 }
 
+// Less does something (sort function).
 func (s byPriority) Less(i, j int) bool {
-	var prio1, prio2 uint
+	var prio1, prio2 uint = 50, 50
 
 	if prior1, ok := s[i].(Priority); ok {
 		prio1 = prior1.Priority()
@@ -32,6 +35,7 @@ func (s byPriority) Less(i, j int) bool {
 	return prio1 > prio2
 }
 
+// Swap does something (sort function).
 func (s byPriority) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }

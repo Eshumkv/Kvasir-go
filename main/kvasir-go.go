@@ -3,9 +3,15 @@ package main
 import (
 	"time"
 
-	k "github.com/eshumkv/kvasir-go"
+	kvasir "github.com/eshumkv/Kvasir-go"
 	"github.com/veandco/go-sdl2/sdl"
 )
+
+// MsPerUpdate specifies the amount of milliseconds per update cycle is the ideal.
+const MsPerUpdate = 1 / 100.0
+
+// MaxNumUpdates specifies how many times update should be called to "catch up".
+const MaxNumUpdates = 5
 
 func main() {
 	sdl.Init(sdl.INIT_EVERYTHING)
@@ -30,19 +36,15 @@ func main() {
 
 	previous := time.Now()
 	lag := 0.0
-	game := k.NewGame(window, renderer)
+	game := kvasir.NewGame(window, renderer)
 
-	for game.IsRunning {
+	for game.IsRunning() {
 		current := time.Now()
 		elapsed := current.Sub(previous)
 		previous = current
 		lag += elapsed.Seconds()
 
-		game.ProcessInput()
-		for i := 0; i < k.MaxNumUpdates && lag >= k.MsPerUpdate; i++ {
-			game.Update(elapsed.Seconds())
-			lag -= k.MsPerUpdate
-		}
-		game.Render(lag / k.MsPerUpdate)
+		game.Update(elapsed.Seconds())
+		game.Render(lag / MsPerUpdate)
 	}
 }

@@ -1,4 +1,4 @@
-package kvasir
+package systems
 
 // Command defines the type used for the Command enum
 type Command int
