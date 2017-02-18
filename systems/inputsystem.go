@@ -9,6 +9,7 @@ import (
 type InputSystem struct {
 	game     GameInterface
 	entities []ecs.Entity
+	commands []bool
 }
 
 // NewInputSystem returns a pointer to a new InputSystem.
@@ -16,6 +17,7 @@ func NewInputSystem(game GameInterface) *InputSystem {
 	return &InputSystem{
 		game:     game,
 		entities: make([]ecs.Entity, 0),
+		commands: make([]bool, CommandCount),
 	}
 }
 
@@ -36,15 +38,15 @@ func (s *InputSystem) Update(dt float64) {
 		case *sdl.QuitEvent:
 			s.game.SetRunning(false)
 		case *sdl.KeyDownEvent:
-			s.game.SetCommand(toCommand(t.Keysym.Sym), true)
+			s.commands[toCommand(t.Keysym.Sym)] = true
 
-			if s.game.GetCommand(CommandFullscreen) {
+			if s.commands[CommandFullscreen] {
 				s.game.ToggleFullscreen()
-				s.game.SetCommand(CommandFullscreen, false)
+				s.commands[CommandFullscreen] = false
 			}
 
 		case *sdl.KeyUpEvent:
-			s.game.SetCommand(toCommand(t.Keysym.Sym), false)
+			s.commands[toCommand(t.Keysym.Sym)] = false
 		}
 	}
 }

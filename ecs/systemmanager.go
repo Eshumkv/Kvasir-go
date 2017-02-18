@@ -2,32 +2,85 @@ package ecs
 
 import "sort"
 
+// SystemType defines the type used for the SystemType enum
+type SystemType int
+
+// The SystemType enum
+const (
+	STypeBeforeUpdate SystemType = iota
+	STypeUpdate
+	STypeRender
+	STypeCount
+)
+
 // SystemManager manages all the systems.
 type SystemManager struct {
-	systems []System
+	beforeUpdateSystems []System
+	updateSystems       []System
+	renderSystems       []System
 }
 
 // NewSystemManager makes a new system manager.
 func NewSystemManager() *SystemManager {
 	return &SystemManager{
-		systems: make([]System, 0),
+		beforeUpdateSystems: make([]System, 0),
+		updateSystems:       make([]System, 0),
+		renderSystems:       make([]System, 0),
 	}
 }
 
 // Systems returns the systems that this manager manages.
-func (mngr *SystemManager) Systems() []System {
-	return mngr.systems
+func (mngr *SystemManager) Systems(t SystemType) []System {
+	switch t {
+	case STypeBeforeUpdate:
+		return mngr.beforeUpdateSystems
+	case STypeUpdate:
+		return mngr.updateSystems
+	case STypeRender:
+		return mngr.renderSystems
+	}
+	return nil
+}
+
+// AllSystems returns ALL the systems that this manager manages.
+func (mngr *SystemManager) AllSystems() []System {
+	s := append(mngr.beforeUpdateSystems, mngr.updateSystems...)
+	s = append(s, mngr.renderSystems...)
+	return s
 }
 
 // AddSystem adds a system to the manager and sorts the list based on priority.
-func (mngr *SystemManager) AddSystem(s System) {
-	mngr.systems = append(mngr.systems, s)
-	sort.Sort(byPriority(mngr.systems))
+func (mngr *SystemManager) AddSystem(s System, t SystemType) {
+	switch t {
+	case STypeBeforeUpdate:
+		mngr.beforeUpdateSystems = append(mngr.beforeUpdateSystems, s)
+		sort.Sort(byPriority(mngr.beforeUpdateSystems))
+	case STypeUpdate:
+		mngr.updateSystems = append(mngr.updateSystems, s)
+		sort.Sort(byPriority(mngr.updateSystems))
+	case STypeRender:
+		mngr.renderSystems = append(mngr.renderSystems, s)
+		sort.Sort(byPriority(mngr.renderSystems))
+	}
+}
+
+// BeforeUpdate goes through the sorted list and updates all the systems.
+func (mngr *SystemManager) BeforeUpdate(dt float64) {
+	for _, system := range mngr.beforeUpdateSystems {
+		system.Update(dt)
+	}
 }
 
 // Update goes through the sorted list and updates all the systems.
 func (mngr *SystemManager) Update(dt float64) {
-	for _, system := range mngr.systems {
+	for _, system := range mngr.updateSystems {
 		system.Update(dt)
+	}
+}
+
+// Render goes through the sorted list and renders all the systems.
+func (mngr *SystemManager) Render(lag float64) {
+	for _, system := range mngr.renderSystems {
+		system.Update(lag)
 	}
 }

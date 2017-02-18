@@ -44,7 +44,13 @@ func main() {
 		previous = current
 		lag += elapsed.Seconds()
 
-		game.Update(elapsed.Seconds())
+		game.BeforeUpdate(elapsed.Seconds())
+
+		for i := 0; i >= MaxNumUpdates && lag >= MsPerUpdate; i++ {
+			game.Update(elapsed.Seconds())
+			lag -= MsPerUpdate
+		}
+
 		game.Render(lag / MsPerUpdate)
 	}
 }

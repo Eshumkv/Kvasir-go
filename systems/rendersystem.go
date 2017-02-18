@@ -1,8 +1,6 @@
 package systems
 
 import (
-	"fmt"
-
 	"github.com/eshumkv/Kvasir-go/components"
 	"github.com/eshumkv/Kvasir-go/ecs"
 	"github.com/veandco/go-sdl2/sdl"
@@ -41,7 +39,6 @@ func (s *RenderSystem) Update(dt float64) {
 		}
 		comp := genericComponent.(*components.ColorComponent)
 		rect := entity.Rect()
-		fmt.Println(rect)
 
 		r, g, b, _, _ := s.renderer.GetDrawColor()
 		s.renderer.SetDrawColor(comp.R, comp.G, comp.B, 255)

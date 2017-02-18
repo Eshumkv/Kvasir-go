@@ -7,7 +7,5 @@ type GameInterface interface {
 	Render(lag float64)
 	IsRunning() bool
 	SetRunning(state bool)
-	SetCommand(c Command, state bool)
-	GetCommand(c Command) bool
 	ToggleFullscreen()
 }

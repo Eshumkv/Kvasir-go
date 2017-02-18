@@ -12,10 +12,8 @@ type Game struct {
 	window       *sdl.Window
 	renderer     *sdl.Renderer
 	isRunning    bool
-	commands     []bool
 	isFullscreen bool
-	sManager     *ecs.SystemManager
-	rManager     *ecs.SystemManager
+	systems      *ecs.SystemManager
 }
 
 // NewGame creates a new game.
@@ -24,9 +22,7 @@ func NewGame(window *sdl.Window, renderer *sdl.Renderer) *Game {
 		window:    window,
 		renderer:  renderer,
 		isRunning: true,
-		commands:  make([]bool, systems.CommandCount),
-		sManager:  ecs.NewSystemManager(),
-		rManager:  ecs.NewSystemManager(),
+		systems:   ecs.NewSystemManager(),
 	}
 
 	// Init
@@ -37,15 +33,21 @@ func NewGame(window *sdl.Window, renderer *sdl.Renderer) *Game {
 	return &result
 }
 
+// BeforeUpdate runs before the update-loop. Do things you only want to do once
+// per game-loop/frame/...
+func (game *Game) BeforeUpdate(dt float64) {
+	game.systems.BeforeUpdate(dt)
+}
+
 // Update updates the gamestate.
 func (game *Game) Update(dt float64) {
-	game.sManager.Update(dt)
+	game.systems.Update(dt)
 }
 
 // Render shows the gamestate on screen.
 func (game *Game) Render(lag float64) {
 	game.renderer.Clear()
-	game.rManager.Update(lag)
+	game.systems.Render(lag)
 	game.renderer.Present()
 }
 
@@ -55,14 +57,6 @@ func (game *Game) IsRunning() bool {
 
 func (game *Game) SetRunning(state bool) {
 	game.isRunning = state
-}
-
-func (game *Game) SetCommand(c systems.Command, state bool) {
-	game.commands[c] = state
-}
-
-func (game *Game) GetCommand(c systems.Command) bool {
-	return game.commands[c]
 }
 
 func (game *Game) ToggleFullscreen() {
@@ -77,22 +71,22 @@ func (game *Game) ToggleFullscreen() {
 }
 
 func (game *Game) setupSystems() {
-	// Setup the render systems
-	game.rManager.AddSystem(systems.NewRenderSystem(game.renderer))
+	// Setup the systems
+	game.systems.AddSystem(
+		systems.NewRenderSystem(game.renderer), ecs.STypeRender)
+	game.systems.AddSystem(
+		systems.NewInputSystem(game), ecs.STypeBeforeUpdate)
 
-	for _, system := range game.rManager.Systems() {
+	for _, system := range game.systems.AllSystems() {
 		switch system.(type) {
 		case *systems.RenderSystem:
-			entity := ecs.NewEntity(0, 0, 50, 50).Add(components.NewColorComponent(50, 60, 200))
+			entity := ecs.NewEntity(
+				0, 0, 50, 50).Add(
+				components.NewColorComponent(50, 60, 200))
 			system.Add(entity)
-		}
-	}
-
-	// Setup the other systems
-	game.sManager.AddSystem(systems.NewInputSystem(game))
-	for _, system := range game.sManager.Systems() {
-		switch system.(type) {
 		case *systems.InputSystem:
+			// No setup required
+			continue
 		}
 	}
 }
