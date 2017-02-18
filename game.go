@@ -74,19 +74,18 @@ func (game *Game) setupSystems() {
 	// Setup the systems
 	game.systems.AddSystem(
 		systems.NewRenderSystem(game.renderer), ecs.STypeRender)
-	game.systems.AddSystem(
-		systems.NewInputSystem(game), ecs.STypeBeforeUpdate)
+	game.systems.AddSystem(systems.NewInputSystem(game), ecs.STypeBeforeUpdate)
 
 	for _, system := range game.systems.AllSystems() {
 		switch system.(type) {
 		case *systems.RenderSystem:
+			system.Init(game.systems)
 			entity := ecs.NewEntity(
 				0, 0, 50, 50).Add(
 				components.NewColorComponent(50, 60, 200))
 			system.Add(entity)
 		case *systems.InputSystem:
-			// No setup required
-			continue
+			system.Init(game.systems)
 		}
 	}
 }

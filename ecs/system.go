@@ -6,6 +6,7 @@ type System interface {
 	Add(e *Entity)
 	Update(dt float64)
 	Delete(e Entity)
+	HandleMessage(msg Message, data interface{})
 }
 
 // Priority implies that some things are more important than others.

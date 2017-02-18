@@ -10,6 +10,7 @@ type InputSystem struct {
 	game     GameInterface
 	entities []ecs.Entity
 	commands []bool
+	mgnr     *ecs.SystemManager
 }
 
 // NewInputSystem returns a pointer to a new InputSystem.
@@ -23,7 +24,7 @@ func NewInputSystem(game GameInterface) *InputSystem {
 
 // Init initializes the system.
 func (s *InputSystem) Init(mngr *ecs.SystemManager) {
-	// Empty :(
+	s.mgnr = mngr
 }
 
 // Add adds an entity to the system.
@@ -43,6 +44,11 @@ func (s *InputSystem) Update(dt float64) {
 			if s.commands[CommandFullscreen] {
 				s.game.ToggleFullscreen()
 				s.commands[CommandFullscreen] = false
+			}
+
+			// TODO: Remove, just a test
+			if s.commands[CommandShoot] {
+				s.mgnr.SendMessage(MessageGeneric, "This is it")
 			}
 
 		case *sdl.KeyUpEvent:
@@ -90,4 +96,8 @@ func (s *InputSystem) Delete(e ecs.Entity) {
 // Priority defines the priority of this system.
 func (s InputSystem) Priority() uint {
 	return 0
+}
+
+// HandleMessage handles any messages that need to be dealt with.
+func (s InputSystem) HandleMessage(msg ecs.Message, data interface{}) {
 }

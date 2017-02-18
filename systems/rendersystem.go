@@ -1,6 +1,10 @@
 package systems
 
 import (
+	"errors"
+
+	"fmt"
+
 	"github.com/eshumkv/Kvasir-go/components"
 	"github.com/eshumkv/Kvasir-go/ecs"
 	"github.com/veandco/go-sdl2/sdl"
@@ -33,11 +37,10 @@ func (s *RenderSystem) Add(e *ecs.Entity) {
 // Update handles the update of the system.
 func (s *RenderSystem) Update(dt float64) {
 	for _, entity := range s.entities {
-		genericComponent, ok := entity.Get("*components.ColorComponent")
-		if !ok {
+		comp, err := getColorComponent(&entity)
+		if err != nil {
 			continue
 		}
-		comp := genericComponent.(*components.ColorComponent)
 		rect := entity.Rect()
 
 		r, g, b, _, _ := s.renderer.GetDrawColor()
@@ -64,4 +67,23 @@ func (s *RenderSystem) Delete(e ecs.Entity) {
 // Priority defines the priority of this system.
 func (s RenderSystem) Priority() uint {
 	return 50
+}
+
+// HandleMessage handles any messages that need to be dealt with.
+func (s RenderSystem) HandleMessage(msg ecs.Message, data interface{}) {
+	switch msg {
+	case MessageGeneric:
+		d := data.(string)
+		fmt.Println(d)
+		comp, _ := getColorComponent(&s.entities[0])
+		comp.R += 10
+	}
+}
+
+func getColorComponent(e *ecs.Entity) (*components.ColorComponent, error) {
+	genericComponent, ok := e.Get("*components.ColorComponent")
+	if !ok {
+		return nil, errors.New("No ColorComponent")
+	}
+	return genericComponent.(*components.ColorComponent), nil
 }
