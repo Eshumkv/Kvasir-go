@@ -9,7 +9,6 @@ import (
 // InputSystem defines the system to process input.
 type InputSystem struct {
 	game     parts.GameInterface
-	entities []ecs.Entity
 	commands []bool
 	mgnr     *ecs.SystemManager
 }
@@ -18,7 +17,6 @@ type InputSystem struct {
 func NewInputSystem(game parts.GameInterface) *InputSystem {
 	return &InputSystem{
 		game:     game,
-		entities: make([]ecs.Entity, 0),
 		commands: make([]bool, CommandCount),
 	}
 }
@@ -26,11 +24,6 @@ func NewInputSystem(game parts.GameInterface) *InputSystem {
 // Init initializes the system.
 func (s *InputSystem) Init(mngr *ecs.SystemManager) {
 	s.mgnr = mngr
-}
-
-// Add adds an entity to the system.
-func (s *InputSystem) Add(e *ecs.Entity) {
-	s.entities = append(s.entities, *e)
 }
 
 // TODO: make the game go through the message queue as well
@@ -49,11 +42,6 @@ func (s *InputSystem) Update(dt float64) {
 			if s.commands[CommandFullscreen] {
 				s.game.ToggleFullscreen()
 				s.commands[CommandFullscreen] = false
-			}
-
-			// TODO: Remove, just a test
-			if s.commands[CommandShoot] {
-				s.mgnr.SendMessage(MessageGeneric, "This is it")
 			}
 
 		case *sdl.KeyUpEvent:
@@ -84,25 +72,17 @@ func toCommand(keycode sdl.Keycode) Command {
 	}
 }
 
-// Delete deletes an entity from this system.
-func (s *InputSystem) Delete(e ecs.Entity) {
-	var delete = -1
-	for index, entity := range s.entities {
-		if entity.ID() == e.ID() {
-			delete = index
-			break
-		}
-	}
-	if delete >= 0 {
-		s.entities = append(s.entities[:delete], s.entities[delete+1:]...)
-	}
-}
-
 // Priority defines the priority of this system.
 func (s InputSystem) Priority() uint {
 	return 0
 }
 
 // HandleMessage handles any messages that need to be dealt with.
-func (s InputSystem) HandleMessage(msg ecs.Message, data interface{}) {
+func (s InputSystem) HandleMessage(
+	msg ecs.Message, data interface{}) interface{} {
+	switch msg {
+	case MessageGetCommands:
+		return s.commands
+	}
+	return nil
 }

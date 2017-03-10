@@ -3,7 +3,7 @@ package systems
 import (
 	"errors"
 
-	"fmt"
+	"sort"
 
 	"github.com/eshumkv/Kvasir-go/components"
 	"github.com/eshumkv/Kvasir-go/ecs"
@@ -13,58 +13,52 @@ import (
 
 // RenderSystem defines the system to render stuff to the screen.
 type RenderSystem struct {
+	id       string
+	mngr     *ecs.SystemManager
 	renderer *sdl.Renderer
-	entities []ecs.Entity
 	camera   parts.CameraInterface
 }
 
 // NewRenderSystem returns a pointer to a new RenderSystem.
-func NewRenderSystem(renderer *sdl.Renderer) *RenderSystem {
+func NewRenderSystem(
+	renderer *sdl.Renderer, camera parts.CameraInterface) *RenderSystem {
 	return &RenderSystem{
+		id:       "RenderSystem",
 		renderer: renderer,
-		entities: make([]ecs.Entity, 0),
+		camera:   camera,
 	}
 }
 
 // Init initializes the system.
 func (s *RenderSystem) Init(mngr *ecs.SystemManager) {
-	// Empty :(
-}
-
-// Add adds an entity to the system.
-func (s *RenderSystem) Add(e *ecs.Entity) {
-	s.entities = append(s.entities, *e)
+	s.mngr = mngr
 }
 
 // Update handles the update of the system.
 func (s *RenderSystem) Update(dt float64) {
-	for _, entity := range s.entities {
+	ret, err := s.mngr.SendMessage(MessageGetEntitiesOfSystem, s.id)
+	if err != nil {
+		return
+	}
+	entities := ret.([]ecs.Entity)
+	sort.Sort(ByZ(entities))
+	for _, entity := range entities {
 		comp, err := getColorComponent(&entity)
 		if err != nil {
 			continue
 		}
 		rect := entity.Rect()
 		sx, sy := s.camera.GetScreenLocation(float64(rect.X), float64(rect.Y))
-		toDraw := sdl.Rect{int32(sx), int32(sy), entity.W(), entity.H()}
+		toDraw := sdl.Rect{
+			X: int32(sx),
+			Y: int32(sy),
+			W: entity.W(),
+			H: entity.H()}
 
 		r, g, b, _, _ := s.renderer.GetDrawColor()
 		s.renderer.SetDrawColor(comp.R, comp.G, comp.B, 255)
 		s.renderer.FillRect(&toDraw)
 		s.renderer.SetDrawColor(r, g, b, 255)
-	}
-}
-
-// Delete deletes an entity from this system.
-func (s *RenderSystem) Delete(e ecs.Entity) {
-	var delete = -1
-	for index, entity := range s.entities {
-		if entity.ID() == e.ID() {
-			delete = index
-			break
-		}
-	}
-	if delete >= 0 {
-		s.entities = append(s.entities[:delete], s.entities[delete+1:]...)
 	}
 }
 
@@ -74,16 +68,13 @@ func (s RenderSystem) Priority() uint {
 }
 
 // HandleMessage handles any messages that need to be dealt with.
-func (s *RenderSystem) HandleMessage(msg ecs.Message, data interface{}) {
+func (s *RenderSystem) HandleMessage(
+	msg ecs.Message, data interface{}) interface{} {
 	switch msg {
-	case MessageGeneric:
-		d := data.(string)
-		fmt.Println(d)
-		comp, _ := getColorComponent(&s.entities[0])
-		comp.R += 10
 	case MessageCameraUpdate:
 		s.camera = data.(parts.CameraInterface)
 	}
+	return nil
 }
 
 func getColorComponent(e *ecs.Entity) (*components.ColorComponent, error) {
@@ -93,3 +84,10 @@ func getColorComponent(e *ecs.Entity) (*components.ColorComponent, error) {
 	}
 	return genericComponent.(*components.ColorComponent), nil
 }
+
+// ByZ implements the sort interface for []ecs.Entity on Z value.
+type ByZ []ecs.Entity
+
+func (z ByZ) Len() int           { return len(z) }
+func (z ByZ) Swap(i, j int)      { z[i], z[j] = z[j], z[i] }
+func (z ByZ) Less(i, j int) bool { return z[i].Z() < z[j].Z() }

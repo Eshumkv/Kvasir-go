@@ -6,5 +6,8 @@ import "github.com/eshumkv/Kvasir-go/ecs"
 const (
 	MessageGeneric ecs.Message = iota
 	MessageCameraUpdate
+	MessageGetCommands
+	MessageGetEntitiesOfSystem
+	MessageSetEntityLocation
 	MessageCount
 )

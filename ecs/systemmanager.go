@@ -1,6 +1,7 @@
 package ecs
 
 import (
+	"errors"
 	"sort"
 )
 
@@ -21,6 +22,7 @@ type SystemManager struct {
 	updateSystems       []System
 	renderSystems       []System
 	allSystems          []System
+	entityManager       EntityManager
 }
 
 // NewSystemManager makes a new system manager.
@@ -103,9 +105,30 @@ func (mngr *SystemManager) Render(lag float64) {
 	}
 }
 
-// SendMessage sends a message to all systems.
-func (mngr *SystemManager) SendMessage(msg Message, data interface{}) {
+// SendMessage sends a message to all systems and the entityManager.
+func (mngr *SystemManager) SendMessage(
+	msg Message, data interface{}) (interface{}, error) {
 	for _, system := range mngr.AllSystems() {
-		system.HandleMessage(msg, data)
+		ret := system.HandleMessage(msg, data)
+		if ret != nil {
+			return ret, nil
+		}
 	}
+
+	ret := mngr.entityManager.HandleMessage(msg, data)
+	if ret != nil {
+		return ret, nil
+	}
+
+	return nil, errors.New("Whoopsie")
+}
+
+// SetEntityManager sets the entitymanager.
+func (mngr *SystemManager) SetEntityManager(em EntityManager) {
+	mngr.entityManager = em
+}
+
+// GetEntityManager returns the entitymanager.
+func (mngr SystemManager) GetEntityManager() *EntityManager {
+	return &mngr.entityManager
 }

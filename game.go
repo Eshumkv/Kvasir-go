@@ -84,24 +84,28 @@ func (game *Game) ToggleFullscreen() {
 func (game *Game) setupSystems() {
 	// Setup the systems
 	game.systems.AddSystem(
-		systems.NewRenderSystem(game.renderer), ecs.STypeRender)
+		systems.NewRenderSystem(game.renderer, game.camera), ecs.STypeRender)
 	game.systems.AddSystem(systems.NewInputSystem(game), ecs.STypeBeforeUpdate)
-	game.systems.AddSystem(systems.NewCameraSystem(game.camera), ecs.STypeUpdate)
+	game.systems.AddSystem(
+		systems.NewCameraSystem(game.camera), ecs.STypeUpdate)
+	game.systems.AddSystem(
+		systems.NewPlayerHandlingSystem(), ecs.STypeUpdate)
 
 	player := ecs.NewEntity(
 		0, 0, 50, 50).Add(
 		components.NewColorComponent(50, 60, 200))
+	player.SetZ(11)
+	test := ecs.NewEntity(
+		100, -80, 50, 50).Add(
+		components.NewColorComponent(5, 160, 100))
+
+	mngr := systems.NewMyEntityManager()
+	mngr.Add(*player, "RenderSystem", "CameraSystem", "PlayerHandlingSystem")
+	mngr.Add(*test, "RenderSystem")
+	game.systems.SetEntityManager(mngr)
+
 	for _, system := range game.systems.AllSystems() {
-		switch system.(type) {
-		case *systems.RenderSystem:
-			system.Init(game.systems)
-			system.Add(player)
-		case *systems.InputSystem:
-			system.Init(game.systems)
-		case *systems.CameraSystem:
-			system.Init(game.systems)
-			system.Add(player)
-		}
+		system.Init(game.systems)
 	}
 }
 

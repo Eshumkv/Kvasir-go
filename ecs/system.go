@@ -3,10 +3,8 @@ package ecs
 // System specifies a system.
 type System interface {
 	Init(mngr *SystemManager)
-	Add(e *Entity)
 	Update(dt float64)
-	Delete(e Entity)
-	HandleMessage(msg Message, data interface{})
+	HandleMessage(msg Message, data interface{}) interface{}
 }
 
 // Priority implies that some things are more important than others.

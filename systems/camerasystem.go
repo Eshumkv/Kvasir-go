@@ -7,7 +7,7 @@ import (
 
 // CameraSystem defines the system to process input.
 type CameraSystem struct {
-	entity *ecs.Entity
+	id     string
 	camera parts.CameraInterface
 	mngr   *ecs.SystemManager
 }
@@ -15,6 +15,7 @@ type CameraSystem struct {
 // NewCameraSystem returns a pointer to a new CameraSystem.
 func NewCameraSystem(camera parts.CameraInterface) *CameraSystem {
 	return &CameraSystem{
+		id:     "CameraSystem",
 		camera: camera,
 	}
 }
@@ -26,24 +27,34 @@ func (s *CameraSystem) Init(mngr *ecs.SystemManager) {
 
 // Add adds an entity to the system.
 func (s *CameraSystem) Add(e *ecs.Entity) {
-	s.entity = e
-	s.mngr.SendMessage(MessageCameraUpdate, s.camera)
+	panic("Not allowed to add to this system!")
 }
 
 // Update handles the update of the system.
 func (s *CameraSystem) Update(dt float64) {
-	if s.entity != nil {
-		x, y := int32(s.entity.X()), int32(s.entity.Y())
-		s.camera.SetX(x)
-		s.camera.SetY(y)
+
+	ret, err := s.mngr.SendMessage(MessageGetEntitiesOfSystem, s.id)
+	if err != nil {
+		return
 	}
+	entities := ret.([]ecs.Entity)
+	if len(entities) == 0 {
+		return
+	}
+	entity := entities[0]
+	x, y := int32(entity.X()), int32(entity.Y())
+
+	s.camera.SetX(x)
+	s.camera.SetY(y)
 }
 
 // Delete deletes an entity from this system.
 func (s *CameraSystem) Delete(e ecs.Entity) {
-	s.entity = nil
+	panic("Not allowed to delete from this system!")
 }
 
 // HandleMessage handles any messages that need to be dealt with.
-func (s CameraSystem) HandleMessage(msg ecs.Message, data interface{}) {
+func (s CameraSystem) HandleMessage(
+	msg ecs.Message, data interface{}) interface{} {
+	return nil
 }
