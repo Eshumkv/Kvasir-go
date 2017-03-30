@@ -1,7 +1,7 @@
 package kvasir
 
 import (
-	"github.com/eshumkv/Kvasir-go/components"
+	"github.com/Eshumkv/kvasir-go/scenes"
 	"github.com/eshumkv/Kvasir-go/ecs"
 	"github.com/eshumkv/Kvasir-go/parts"
 	"github.com/eshumkv/Kvasir-go/systems"
@@ -16,6 +16,7 @@ type Game struct {
 	isFullscreen bool
 	systems      *ecs.SystemManager
 	camera       parts.CameraInterface
+	world        World
 }
 
 // Camera implements the parts.CameraInterface.
@@ -32,7 +33,6 @@ func NewGame(window *sdl.Window, renderer *sdl.Renderer) *Game {
 		window:    window,
 		renderer:  renderer,
 		isRunning: true,
-		systems:   ecs.NewSystemManager(),
 		camera:    newCamera(w, h),
 	}
 
@@ -40,6 +40,8 @@ func NewGame(window *sdl.Window, renderer *sdl.Renderer) *Game {
 	renderer.SetDrawColor(110, 132, 174, 255)
 
 	result.setupSystems()
+
+	result.systems.SetEntityManager(scenes.TestScene(systems.NewMyEntityManager()))
 
 	return &result
 }
@@ -82,6 +84,8 @@ func (game *Game) ToggleFullscreen() {
 }
 
 func (game *Game) setupSystems() {
+	game.systems = ecs.NewSystemManager(game)
+
 	// Setup the systems
 	game.systems.AddSystem(
 		systems.NewRenderSystem(game.renderer, game.camera), ecs.STypeRender)
@@ -89,20 +93,11 @@ func (game *Game) setupSystems() {
 	game.systems.AddSystem(
 		systems.NewCameraSystem(game.camera), ecs.STypeUpdate)
 	game.systems.AddSystem(
+		systems.NewCollisionSystem(), ecs.STypeUpdate)
+	game.systems.AddSystem(
 		systems.NewPlayerHandlingSystem(), ecs.STypeUpdate)
 
-	player := ecs.NewEntity(
-		0, 0, 50, 50).Add(
-		components.NewColorComponent(50, 60, 200))
-	player.SetZ(11)
-	test := ecs.NewEntity(
-		100, -80, 50, 50).Add(
-		components.NewColorComponent(5, 160, 100))
-
-	mngr := systems.NewMyEntityManager()
-	mngr.Add(*player, "RenderSystem", "CameraSystem", "PlayerHandlingSystem")
-	mngr.Add(*test, "RenderSystem")
-	game.systems.SetEntityManager(mngr)
+	game.systems.SetEntityManager(systems.NewMyEntityManager())
 
 	for _, system := range game.systems.AllSystems() {
 		system.Init(game.systems)
@@ -135,4 +130,17 @@ func (camera Camera) GetScreenLocation(x, y float64) (int, int) {
 	screenX := (int32(x) - camera.x) + camera.halfWidth
 	screenY := (int32(y) - camera.y) + camera.halfHeight
 	return int(screenX), int(screenY)
+}
+
+// HandleMessage handles any messages that need to be dealt with.
+func (game *Game) HandleMessage(
+	msg ecs.Message, data interface{}) interface{} {
+	switch msg {
+	case systems.MessageGameQuit:
+		game.SetRunning(false)
+	case systems.MessageGameChangeScene:
+		scene := data.(ecs.EntityManager)
+		game.systems.SetEntityManager(scene)
+	}
+	return nil
 }

@@ -49,11 +49,17 @@ func (s *MyEntityManager) Delete(id uint64, systemIDs ...string) {
 		}
 
 		item.systems = newMap
+		s.items[id] = item
 	}
 }
 
-func contains(list []string, item string) bool {
-	return true
+func contains(haystack []string, needle string) bool {
+	for _, item := range haystack {
+		if item == needle {
+			return true
+		}
+	}
+	return false
 }
 
 // Get returns an entity managed by this manager.

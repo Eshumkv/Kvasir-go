@@ -1,20 +1,19 @@
 package systems
 
 import (
+	"github.com/Eshumkv/kvasir-go/scenes"
 	"github.com/eshumkv/Kvasir-go/ecs"
 )
 
 type PlayerHandlingSystem struct {
-	id       string
-	entities []ecs.Entity
-	mngr     *ecs.SystemManager
+	id   string
+	mngr *ecs.SystemManager
 }
 
 // NewPlayerHandlingSystem returns a pointer to a new PlayerHandlingSystem.
 func NewPlayerHandlingSystem() *PlayerHandlingSystem {
 	return &PlayerHandlingSystem{
-		id:       "PlayerHandlingSystem",
-		entities: make([]ecs.Entity, 0),
+		id: "PlayerHandlingSystem",
 	}
 }
 
@@ -31,6 +30,10 @@ func (s *PlayerHandlingSystem) Update(dt float64) {
 
 	}
 	commands := ret.([]bool)
+
+	if commands[CommandShoot] {
+		s.mngr.SendMessage(MessageGameChangeScene, scenes.TestScene(NewMyEntityManager()))
+	}
 
 	ret, err = s.mngr.SendMessage(MessageGetEntitiesOfSystem, s.id)
 	if err != nil {

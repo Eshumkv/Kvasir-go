@@ -2,19 +2,18 @@ package systems
 
 import (
 	"github.com/eshumkv/Kvasir-go/ecs"
-	"github.com/eshumkv/Kvasir-go/parts"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 // InputSystem defines the system to process input.
 type InputSystem struct {
-	game     parts.GameInterface
+	game     ecs.GameInterface
 	commands []bool
 	mgnr     *ecs.SystemManager
 }
 
 // NewInputSystem returns a pointer to a new InputSystem.
-func NewInputSystem(game parts.GameInterface) *InputSystem {
+func NewInputSystem(game ecs.GameInterface) *InputSystem {
 	return &InputSystem{
 		game:     game,
 		commands: make([]bool, CommandCount),

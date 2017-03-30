@@ -23,15 +23,17 @@ type SystemManager struct {
 	renderSystems       []System
 	allSystems          []System
 	entityManager       EntityManager
+	game                GameInterface
 }
 
 // NewSystemManager makes a new system manager.
-func NewSystemManager() *SystemManager {
+func NewSystemManager(game GameInterface) *SystemManager {
 	return &SystemManager{
 		beforeUpdateSystems: make([]System, 0),
 		updateSystems:       make([]System, 0),
 		renderSystems:       make([]System, 0),
 		allSystems:          make([]System, 0),
+		game:                game,
 	}
 }
 
@@ -105,7 +107,7 @@ func (mngr *SystemManager) Render(lag float64) {
 	}
 }
 
-// SendMessage sends a message to all systems and the entityManager.
+// SendMessage sends a message to all systems, entityManager and Game.
 func (mngr *SystemManager) SendMessage(
 	msg Message, data interface{}) (interface{}, error) {
 	for _, system := range mngr.AllSystems() {
@@ -116,6 +118,11 @@ func (mngr *SystemManager) SendMessage(
 	}
 
 	ret := mngr.entityManager.HandleMessage(msg, data)
+	if ret != nil {
+		return ret, nil
+	}
+
+	ret = mngr.game.HandleMessage(msg, data)
 	if ret != nil {
 		return ret, nil
 	}
