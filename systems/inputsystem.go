@@ -1,55 +1,38 @@
 package systems
 
-import (
-	"github.com/eshumkv/Kvasir-go/ecs"
-	"github.com/veandco/go-sdl2/sdl"
-)
+import "github.com/veandco/go-sdl2/sdl"
 
-// InputSystem defines the system to process input.
+//------------------------------------------------------------------------------
+// Input system
+
+// InputSystem is the system that handles input.
 type InputSystem struct {
-	game     ecs.GameInterface
-	commands []bool
-	mgnr     *ecs.SystemManager
+	commands     []bool
+	quitDelegate func()
 }
 
-// NewInputSystem returns a pointer to a new InputSystem.
-func NewInputSystem(game ecs.GameInterface) *InputSystem {
+// NewInputSystem creates a new InputSystem
+func NewInputSystem(delegate func()) *InputSystem {
 	return &InputSystem{
-		game:     game,
-		commands: make([]bool, CommandCount),
+		commands:     make([]bool, 10),
+		quitDelegate: delegate,
 	}
 }
 
-// Init initializes the system.
-func (s *InputSystem) Init(mngr *ecs.SystemManager) {
-	s.mgnr = mngr
-}
-
-// TODO: make the game go through the message queue as well
-// 		You know, ask the game to set it to fullscreen, so there's not so much
-// 		coupling.
-
-// Update handles the update of the system.
-func (s *InputSystem) Update(dt float64) {
+// Update updates this system.
+func (system *InputSystem) Update(dt float64) {
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
-			s.game.SetRunning(false)
+			system.quitDelegate()
 		case *sdl.KeyDownEvent:
-			s.commands[toCommand(t.Keysym.Sym)] = true
-
-			if s.commands[CommandFullscreen] {
-				s.game.ToggleFullscreen()
-				s.commands[CommandFullscreen] = false
-			}
-
+			system.commands[toCommand(t.Keysym.Sym)] = true
 		case *sdl.KeyUpEvent:
-			s.commands[toCommand(t.Keysym.Sym)] = false
+			system.commands[toCommand(t.Keysym.Sym)] = false
 		}
 	}
 }
 
-// toCommand turns an SDL2 keycode into a game command.
 func toCommand(keycode sdl.Keycode) Command {
 	switch keycode {
 	case sdl.K_F11:
@@ -71,17 +54,21 @@ func toCommand(keycode sdl.Keycode) Command {
 	}
 }
 
-// Priority defines the priority of this system.
-func (s InputSystem) Priority() uint {
-	return 0
-}
+//------------------------------------------------------------------------------
+// Commands
 
-// HandleMessage handles any messages that need to be dealt with.
-func (s InputSystem) HandleMessage(
-	msg ecs.Message, data interface{}) interface{} {
-	switch msg {
-	case MessageGetCommands:
-		return s.commands
-	}
-	return nil
-}
+// Command defines the type used for the Command enum
+type Command int
+
+// The Command enum
+const (
+	CommandNone Command = iota
+	CommandFullscreen
+	CommandShoot
+	CommandLeft
+	CommandUp
+	CommandRight
+	CommandDown
+	CommandSpeedup
+	CommandCount
+)
