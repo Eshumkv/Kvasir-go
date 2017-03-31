@@ -1,6 +1,7 @@
 package systems
 
 import "github.com/veandco/go-sdl2/sdl"
+import "github.com/Eshumkv/kvasir-go/ecs"
 
 //------------------------------------------------------------------------------
 // Input system
@@ -9,6 +10,7 @@ import "github.com/veandco/go-sdl2/sdl"
 type InputSystem struct {
 	commands     []bool
 	quitDelegate func()
+	systemName   string
 }
 
 // NewInputSystem creates a new InputSystem
@@ -16,11 +18,12 @@ func NewInputSystem(delegate func()) *InputSystem {
 	return &InputSystem{
 		commands:     make([]bool, 10),
 		quitDelegate: delegate,
+		systemName:   "InputSystem",
 	}
 }
 
 // Update updates this system.
-func (system *InputSystem) Update(dt float64) {
+func (system *InputSystem) Update(entities []*ecs.Entity, dt float64) {
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
@@ -52,6 +55,17 @@ func toCommand(keycode sdl.Keycode) Command {
 	default:
 		return CommandNone
 	}
+}
+
+// GetComponentNames gives a list of components that this system uses.
+func (system InputSystem) GetComponentNames() []string {
+	var myComponents []string
+	return myComponents
+}
+
+// GetSystemName returns the name of this system.
+func (system InputSystem) GetSystemName() string {
+	return system.systemName
 }
 
 //------------------------------------------------------------------------------
