@@ -146,7 +146,7 @@ func (game *Game) entityRemoveComponentEvent(entityID uint64,
 
 func (game *Game) setupSystems() {
 	systemsToAdd := [...]ecs.SystemInterface{
-		systems.NewInputSystem(game.Quit),
+		systems.NewInputSystem(game.Quit, game.ToggleFullscreen),
 		systems.NewRenderSystem(game.renderer)}
 
 	for _, system := range systemsToAdd {

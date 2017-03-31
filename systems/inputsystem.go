@@ -8,17 +8,19 @@ import "github.com/Eshumkv/kvasir-go/ecs"
 
 // InputSystem is the system that handles input.
 type InputSystem struct {
-	commands     []bool
-	quitDelegate func()
-	systemName   string
+	commands           []bool
+	quitDelegate       func()
+	fullscreenDelegate func()
+	systemName         string
 }
 
 // NewInputSystem creates a new InputSystem
-func NewInputSystem(delegate func()) *InputSystem {
+func NewInputSystem(delegate func(), fullscreen func()) *InputSystem {
 	return &InputSystem{
-		commands:     make([]bool, 10),
-		quitDelegate: delegate,
-		systemName:   "InputSystem",
+		commands:           make([]bool, 10),
+		quitDelegate:       delegate,
+		fullscreenDelegate: fullscreen,
+		systemName:         "InputSystem",
 	}
 }
 
@@ -30,6 +32,11 @@ func (system *InputSystem) Update(entities []*ecs.Entity, dt float64) {
 			system.quitDelegate()
 		case *sdl.KeyDownEvent:
 			system.commands[toCommand(t.Keysym.Sym)] = true
+
+			if system.commands[CommandFullscreen] {
+				system.fullscreenDelegate()
+				system.commands[CommandFullscreen] = false
+			}
 		case *sdl.KeyUpEvent:
 			system.commands[toCommand(t.Keysym.Sym)] = false
 		}
