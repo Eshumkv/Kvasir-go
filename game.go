@@ -5,6 +5,7 @@ import (
 	"github.com/Eshumkv/kvasir-go/ecs"
 	"github.com/Eshumkv/kvasir-go/parts"
 	"github.com/Eshumkv/kvasir-go/systems"
+	"github.com/eshumkv/Kvasir-go/scenes"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -21,6 +22,8 @@ type Game struct {
 	systems         []ecs.SystemInterface
 	entities        map[uint64]*ecs.Entity
 	entitySystemMap map[string][]uint64
+	inputSystem     *systems.InputSystem
+	currentScene    ecs.SceneInterface
 }
 
 // NewGame creates a new game.
@@ -34,6 +37,7 @@ func NewGame(window *sdl.Window, renderer *sdl.Renderer) *Game {
 		systems:         make([]ecs.SystemInterface, 0),
 		entities:        make(map[uint64]*ecs.Entity),
 		entitySystemMap: make(map[string][]uint64),
+		currentScene:    scenes.NewTestScene1(),
 	}
 
 	// Init
@@ -103,6 +107,24 @@ func (game *Game) AddEntity(components ...ecs.ComponentInterface) uint64 {
 	return entity.ID()
 }
 
+func (game *Game) ChangeScene(newScene ecs.SceneInterface,
+	entitiesToKeep ...ecs.Entity) {
+	count := len(newScene.GetEntities()) + len(entitiesToKeep)
+	game.entities = make(map[uint64]*ecs.Entity, count)
+
+	for _, entity := range newScene.GetEntities() {
+		game.entities[entity.ID()] = &entity
+	}
+	for _, entity := range entitiesToKeep {
+		game.entities[entity.ID()] = &entity
+	}
+}
+
+// GetKeyState polls the inputsystem for the keystate.
+func (game Game) GetKeyState(command systems.Command) bool {
+	return game.inputSystem.IsKeyDown(command)
+}
+
 func (game *Game) entityAddComponentEvent(entityID uint64,
 	componentName string) {
 	for _, system := range game.systems {
@@ -145,8 +167,10 @@ func (game *Game) entityRemoveComponentEvent(entityID uint64,
 }
 
 func (game *Game) setupSystems() {
+	game.inputSystem = systems.NewInputSystem(game.Quit, game.ToggleFullscreen)
+
 	systemsToAdd := [...]ecs.SystemInterface{
-		systems.NewInputSystem(game.Quit, game.ToggleFullscreen),
+		game.inputSystem,
 		systems.NewRenderSystem(game.renderer)}
 
 	for _, system := range systemsToAdd {

@@ -75,6 +75,11 @@ func (system InputSystem) GetSystemName() string {
 	return system.systemName
 }
 
+// IsKeyDown returns true when the specified key is down.
+func (system InputSystem) IsKeyDown(command Command) bool {
+	return system.commands[command]
+}
+
 //------------------------------------------------------------------------------
 // Commands
 
