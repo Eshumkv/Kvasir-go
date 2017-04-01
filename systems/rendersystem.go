@@ -3,8 +3,8 @@ package systems
 import (
 	"sort"
 
+	"github.com/Eshumkv/kvasir-go/components"
 	"github.com/Eshumkv/kvasir-go/ecs"
-	"github.com/eshumkv/Kvasir-go/components"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
