@@ -1,56 +1,27 @@
 package ecs
 
-import (
-	"sync"
-	"sync/atomic"
-)
+// EntityID defines an ID of an entity.
+type EntityID uint32
 
-var (
-	counterLock sync.Mutex
-	idInc       uint64
-)
-
-// EntityComponentAddedDelegate defines the delegate that gets
-// called when a component gets added to the entity.
-type EntityComponentAddedDelegate func(entityId uint64, componentName string)
-
-// EntityComponentRemovedDelegate defines the delegate that gets
-// called when a component gets removed from the entity.
-type EntityComponentRemovedDelegate func(entityId uint64, componentName string)
-
-// Entity defines an entity of the ecs.
+// Entity defines an entity of the ecs. Should only be gotten from
+// World.Create()
 type Entity struct {
-	id             uint64
-	components     []ComponentInterface
-	addDelegate    EntityComponentAddedDelegate
-	removeDelegate EntityComponentRemovedDelegate
-}
-
-// NewEntity creates a new entity with a unique identifier.
-func NewEntity(componentCapacity int, add EntityComponentAddedDelegate,
-	remove EntityComponentRemovedDelegate) *Entity {
-	result := &Entity{
-		id:             atomic.AddUint64(&idInc, 1),
-		components:     make([]ComponentInterface, 0, componentCapacity),
-		addDelegate:    add,
-		removeDelegate: remove,
-	}
-	return result
+	id         EntityID
+	components []ComponentInterface
 }
 
 // ID returns the id of this entity.
-func (e Entity) ID() uint64 {
+func (e Entity) ID() EntityID {
 	return e.id
 }
 
 // Add component(s) to the entity.
-func (e *Entity) Add(components ...ComponentInterface) *Entity {
+func (e *Entity) Add(components ...ComponentInterface) {
 	for _, component := range components {
 		e.components = append(e.components, component)
-		e.addDelegate(e.id, component.GetName())
 	}
 
-	return e
+	//return e
 }
 
 // Remove removes a component.
@@ -68,7 +39,6 @@ func (e *Entity) Remove(componentNames ...string) {
 			copy(e.components[index:], e.components[index+1:])
 			e.components[len(e.components)-1] = nil
 			e.components = e.components[:len(e.components)-1]
-			e.removeDelegate(e.id, name)
 		}
 	}
 }

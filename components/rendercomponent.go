@@ -1,14 +1,23 @@
 package components
 
+import (
+	"github.com/Eshumkv/kvasir-go/ecs"
+)
+
 type RenderComponent struct {
-	name   string
-	active bool
+	name    string
+	active  bool
+	entity  ecs.EntityID
+	R, G, B uint8
 }
 
-func NewRenderComponent() *RenderComponent {
+func NewRenderComponent(r, g, b uint8) *RenderComponent {
 	return &RenderComponent{
 		name:   "Render",
 		active: true,
+		R:      r,
+		G:      g,
+		B:      b,
 	}
 }
 
@@ -18,4 +27,12 @@ func (c *RenderComponent) SetActive(state bool) {
 
 func (c RenderComponent) GetName() string {
 	return c.name
+}
+
+func (c *RenderComponent) SetEntityID(id ecs.EntityID) {
+	c.entity = id
+}
+
+func (c RenderComponent) GetEntityID() ecs.EntityID {
+	return c.entity
 }

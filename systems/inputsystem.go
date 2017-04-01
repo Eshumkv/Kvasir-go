@@ -25,7 +25,9 @@ func NewInputSystem(delegate func(), fullscreen func()) *InputSystem {
 }
 
 // Update updates this system.
-func (system *InputSystem) Update(entities []*ecs.Entity, dt float64) {
+func (system *InputSystem) Update(
+	entities []ecs.EntityID, world *ecs.World, dt float64) {
+
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
@@ -73,11 +75,6 @@ func (system InputSystem) GetComponentNames() []string {
 // GetSystemName returns the name of this system.
 func (system InputSystem) GetSystemName() string {
 	return system.systemName
-}
-
-// IsKeyDown returns true when the specified key is down.
-func (system InputSystem) IsKeyDown(command Command) bool {
-	return system.commands[command]
 }
 
 //------------------------------------------------------------------------------
