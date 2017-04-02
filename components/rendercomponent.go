@@ -7,7 +7,7 @@ import (
 type RenderComponent struct {
 	name    string
 	active  bool
-	entity  ecs.EntityID
+	entity  ecs.Entity
 	R, G, B uint8
 }
 
@@ -29,10 +29,10 @@ func (c RenderComponent) GetName() string {
 	return c.name
 }
 
-func (c *RenderComponent) SetEntityID(id ecs.EntityID) {
+func (c *RenderComponent) SetEntityID(id ecs.Entity) {
 	c.entity = id
 }
 
-func (c RenderComponent) GetEntityID() ecs.EntityID {
+func (c RenderComponent) GetEntityID() ecs.Entity {
 	return c.entity
 }

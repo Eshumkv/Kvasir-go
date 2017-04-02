@@ -7,7 +7,7 @@ import "github.com/veandco/go-sdl2/sdl"
 type SpatialComponent struct {
 	name    string
 	active  bool
-	entity  ecs.EntityID
+	entity  ecs.Entity
 	X, Y, Z int
 	W, H    int
 }
@@ -36,12 +36,12 @@ func (c SpatialComponent) GetName() string {
 }
 
 // SetEntityID sets the EntityID.
-func (c *SpatialComponent) SetEntityID(id ecs.EntityID) {
+func (c *SpatialComponent) SetEntityID(id ecs.Entity) {
 	c.entity = id
 }
 
 // GetEntityID gets the EntityID.
-func (c SpatialComponent) GetEntityID() ecs.EntityID {
+func (c SpatialComponent) GetEntityID() ecs.Entity {
 	return c.entity
 }
 

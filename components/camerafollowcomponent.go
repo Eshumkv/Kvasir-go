@@ -7,7 +7,7 @@ import (
 type CameraFollowComponent struct {
 	name   string
 	active bool
-	entity ecs.EntityID
+	entity ecs.Entity
 }
 
 func NewCameraFollowComponent() *CameraFollowComponent {
@@ -25,10 +25,10 @@ func (c CameraFollowComponent) GetName() string {
 	return c.name
 }
 
-func (c *CameraFollowComponent) SetEntityID(id ecs.EntityID) {
+func (c *CameraFollowComponent) SetEntityID(id ecs.Entity) {
 	c.entity = id
 }
 
-func (c CameraFollowComponent) GetEntityID() ecs.EntityID {
+func (c CameraFollowComponent) GetEntityID() ecs.Entity {
 	return c.entity
 }

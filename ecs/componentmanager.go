@@ -5,25 +5,25 @@ import (
 )
 
 type componentList []ComponentInterface
-type entityList []EntityID
+type entityList []Entity
 
 // ComponentManager manages the components.
 type ComponentManager struct {
-	componentsByEntity  map[EntityID]componentList
+	componentsByEntity  map[Entity]componentList
 	entitiesByComponent map[string]entityList
 }
 
 // NewComponentManager creates a new ComponentManager.
 func NewComponentManager() ComponentManager {
 	return ComponentManager{
-		componentsByEntity:  make(map[EntityID]componentList),
+		componentsByEntity:  make(map[Entity]componentList),
 		entitiesByComponent: make(map[string]entityList),
 	}
 }
 
 // Add adds a component to the entity.
 func (m *ComponentManager) Add(
-	id EntityID, comp ComponentInterface) ComponentInterface {
+	id Entity, comp ComponentInterface) ComponentInterface {
 
 	comp.SetEntityID(id)
 	m.addToComponentsByEntity(id, comp)
@@ -33,7 +33,7 @@ func (m *ComponentManager) Add(
 }
 
 // Get returns a ComponentInterface; and an error if it's not found.
-func (m ComponentManager) Get(id EntityID, name string) (ComponentInterface, error) {
+func (m ComponentManager) Get(id Entity, name string) (ComponentInterface, error) {
 	components := m.componentsByEntity[id]
 	for _, component := range components {
 		if component.GetName() == name {
@@ -44,8 +44,8 @@ func (m ComponentManager) Get(id EntityID, name string) (ComponentInterface, err
 }
 
 // GetEntities returns all the entities with the given components.
-func (m ComponentManager) GetEntities(names []string) []EntityID {
-	entities := make([]EntityID, 0)
+func (m ComponentManager) GetEntities(names []string) []Entity {
+	entities := make([]Entity, 0)
 	for _, name := range names {
 		for _, id := range m.entitiesByComponent[name] {
 			entities = append(entities, id)
@@ -69,7 +69,7 @@ func (m ComponentManager) GetEntityComponents(
 }
 
 // Has checks whether the entity has the given components.
-func (m ComponentManager) Has(id EntityID, name string) bool {
+func (m ComponentManager) Has(id Entity, name string) bool {
 	components := m.componentsByEntity[id]
 	for _, component := range components {
 		if component.GetName() == name {
@@ -80,7 +80,7 @@ func (m ComponentManager) Has(id EntityID, name string) bool {
 }
 
 // HasAll checks if the Entity has all the specified Component.
-func (m ComponentManager) HasAll(id EntityID, names ...string) bool {
+func (m ComponentManager) HasAll(id Entity, names ...string) bool {
 	for _, name := range names {
 		if !m.Has(id, name) {
 			return false
@@ -90,7 +90,7 @@ func (m ComponentManager) HasAll(id EntityID, names ...string) bool {
 }
 
 func (m *ComponentManager) addToComponentsByEntity(
-	id EntityID, comp ComponentInterface) {
+	id Entity, comp ComponentInterface) {
 
 	components, ok := m.componentsByEntity[id]
 	if !ok {
@@ -101,7 +101,7 @@ func (m *ComponentManager) addToComponentsByEntity(
 }
 
 func (m *ComponentManager) addToEntitiesByComponent(
-	id EntityID, comp ComponentInterface) {
+	id Entity, comp ComponentInterface) {
 
 	entities, ok := m.entitiesByComponent[comp.GetName()]
 	if !ok {

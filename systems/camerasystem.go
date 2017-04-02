@@ -31,7 +31,7 @@ func NewCameraSystem(window *sdl.Window) *CameraSystem {
 
 // Update updates this system.
 func (system *CameraSystem) Update(
-	entities []ecs.EntityID, world *ecs.World, dt float64) {
+	entities []ecs.Entity, world *ecs.World, dt float64) {
 
 	w, h := system.window.GetSize()
 	system.halfWidth = w / 2

@@ -26,7 +26,7 @@ func NewInputSystem(delegate func(), fullscreen func()) *InputSystem {
 
 // Update updates this system.
 func (system *InputSystem) Update(
-	entities []ecs.EntityID, world *ecs.World, dt float64) {
+	entities []ecs.Entity, world *ecs.World, dt float64) {
 
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {

@@ -28,7 +28,7 @@ func NewRenderSystem(renderer *sdl.Renderer) *RenderSystem {
 
 // Update updates this system this frame.
 func (system *RenderSystem) Update(
-	entities []ecs.EntityID, world *ecs.World, dt float64) {
+	entities []ecs.Entity, world *ecs.World, dt float64) {
 
 	s := world.GetSystem("CameraSystem")
 	cameraSystem := s.(*CameraSystem)

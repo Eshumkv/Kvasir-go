@@ -4,6 +4,6 @@ package ecs
 type ComponentInterface interface {
 	SetActive(state bool)
 	GetName() string
-	GetEntityID() EntityID
-	SetEntityID(id EntityID)
+	GetEntityID() Entity
+	SetEntityID(id Entity)
 }

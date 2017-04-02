@@ -12,9 +12,6 @@ var (
 
 // World defines the interface for the Entity Component System.
 type World struct {
-	added        []EntityID
-	changed      []EntityID
-	removed      []EntityID
 	em           EntityManager
 	cm           ComponentManager
 	dt           float64
@@ -25,9 +22,6 @@ type World struct {
 // NewWorld returns a new World object.
 func NewWorld(allSystems []SystemInterface) World {
 	return World{
-		added:        make([]EntityID, 0),
-		changed:      make([]EntityID, 0),
-		removed:      make([]EntityID, 0),
 		em:           NewEntityManager(),
 		cm:           NewComponentManager(),
 		systems:      allSystems,
@@ -36,20 +30,17 @@ func NewWorld(allSystems []SystemInterface) World {
 }
 
 // Create a new Entity.
-func (world *World) Create() EntityID {
+func (world *World) Create() Entity {
 	id := atomic.AddUint32(&idInc, 1)
-	entity := Entity{
-		id:         EntityID(id),
-		components: make([]ComponentInterface, 0),
-	}
-	world.added = append(world.added, entity.ID())
+	entity := Entity(id)
+	world.em.Add(entity)
 
-	return entity.ID()
+	return entity
 }
 
 // Remove an entity from the world.
-func (world *World) Remove(id EntityID) {
-	world.removed = append(world.removed, id)
+func (world *World) Remove(id Entity) {
+	world.em.Remove(id)
 }
 
 func (world *World) ClearEntities() {
@@ -72,7 +63,7 @@ func (world *World) Update() {
 
 // AddComponents adds components to an entity.
 func (world *World) AddComponents(
-	id EntityID, components ...ComponentInterface) {
+	id Entity, components ...ComponentInterface) {
 
 	for _, component := range components {
 		world.cm.Add(id, component)

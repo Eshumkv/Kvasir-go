@@ -35,7 +35,7 @@ func (system *SceneSystem) SetFirstScene(
 
 // Update updates this system.
 func (system *SceneSystem) Update(
-	entities []ecs.EntityID, world *ecs.World, dt float64) {
+	entities []ecs.Entity, world *ecs.World, dt float64) {
 
 	system.currentScene.Update(world, dt)
 
