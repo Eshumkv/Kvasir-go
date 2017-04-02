@@ -7,14 +7,14 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type TestScene1 struct {
+type MainMenuScene struct {
 }
 
-func NewTestScene1() *TestScene1 {
-	return &TestScene1{}
+func NewMainMenuScene() *MainMenuScene {
+	return &MainMenuScene{}
 }
 
-func (scene TestScene1) Init(world *ecs.World) {
+func (scene MainMenuScene) Init(world *ecs.World) {
 	id := world.Create()
 	world.AddComponents(id,
 		components.NewRenderComponent(200, 100, 50),
@@ -22,19 +22,19 @@ func (scene TestScene1) Init(world *ecs.World) {
 		components.NewCameraFollowComponent())
 }
 
-func (scene TestScene1) Dispose(world *ecs.World) {
+func (scene MainMenuScene) Dispose(world *ecs.World) {
 
 }
 
-func (scene TestScene1) Resume(world *ecs.World) {
+func (scene MainMenuScene) Resume(world *ecs.World) {
 
 }
 
-func (scene TestScene1) Pause(world *ecs.World) {
+func (scene MainMenuScene) Pause(world *ecs.World) {
 
 }
 
-func (scene TestScene1) Update(world *ecs.World, dt float64) {
+func (scene MainMenuScene) Update(world *ecs.World, dt float64) {
 
 	tempSystem := world.GetSystem("InputSystem")
 	inputSystem := tempSystem.(*systems.InputSystem)
@@ -43,10 +43,11 @@ func (scene TestScene1) Update(world *ecs.World, dt float64) {
 	sceneSystem := tempSystem.(*systems.SceneSystem)
 
 	if inputSystem.IsKeyDown(systems.CommandShoot) {
+		world.ClearEntities()
 		sceneSystem.ChangeScene(NewTestScene2())
 	}
 }
 
-func (scene TestScene1) Render(renderer *sdl.Renderer, world *ecs.World) {
+func (scene MainMenuScene) Render(renderer *sdl.Renderer, world *ecs.World) {
 
 }

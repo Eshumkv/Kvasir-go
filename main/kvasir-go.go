@@ -64,7 +64,7 @@ func main() {
 		systems.NewSceneSystem(renderer)})
 	tempSystem := world.GetSystem("SceneSystem")
 	sceneSystem := tempSystem.(*systems.SceneSystem)
-	sceneSystem.SetFirstScene(scenes.NewTestScene1(), &world)
+	sceneSystem.SetFirstScene(scenes.NewMainMenuScene(), &world)
 
 	for isRunning {
 		current := time.Now()

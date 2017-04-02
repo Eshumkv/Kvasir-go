@@ -52,6 +52,9 @@ func (world *World) Remove(id EntityID) {
 	world.removed = append(world.removed, id)
 }
 
+func (world *World) ClearEntities() {
+}
+
 // SetDeltaTime sets the delta time.
 func (world *World) SetDeltaTime(dt float64) {
 	world.dt = dt
