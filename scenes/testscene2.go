@@ -16,9 +16,10 @@ func NewTestScene2() *TestScene2 {
 
 func (scene TestScene2) Init(world *ecs.World) {
 	id := world.Create()
+	world.ClearEntities()
 	world.AddComponents(id,
 		components.NewRenderComponent(0, 0, 50),
-		components.NewSpatialComponent(0, 0, 0, 50, 50),
+		components.NewSpatialComponent(70, 70, 0, 50, 50),
 		components.NewCameraFollowComponent())
 }
 

@@ -40,7 +40,7 @@ func (system *RenderSystem) Update(
 	for _, spatial := range spatialEntities {
 		entityID := spatial.GetEntityID()
 
-		comp, err := world.GetComponentManager().Get(entityID, "Render")
+		comp, err := world.GetComponent(entityID, "Render")
 		if err != nil {
 			continue
 		}
@@ -65,7 +65,7 @@ func (system *RenderSystem) Update(
 func (system RenderSystem) getAndSortEntities(
 	world *ecs.World) []*components.SpatialComponent {
 
-	list := world.GetComponentManager().GetEntityComponents("Spatial")
+	list := world.GetEntitiesByComponent("Spatial")
 	zEntities := make([]*components.SpatialComponent, 0, len(list))
 	for _, item := range list {
 		c := item.(*components.SpatialComponent)

@@ -38,7 +38,7 @@ func (system *CameraSystem) Update(
 	system.halfHeight = h / 2
 
 	if len(entities) > 0 {
-		comp, err := world.GetComponentManager().Get(entities[0], "Spatial")
+		comp, err := world.GetComponent(entities[0], "Spatial")
 		if err != nil {
 			return
 		}

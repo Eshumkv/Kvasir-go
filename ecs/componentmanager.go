@@ -54,8 +54,8 @@ func (m ComponentManager) GetEntities(names []string) []Entity {
 	return entities
 }
 
-// GetEntityComponents gets all components with that name (type).
-func (m ComponentManager) GetEntityComponents(
+// GetEntitiesByComponent gets all entities with that componentname (type).
+func (m ComponentManager) GetEntitiesByComponent(
 	name string) []ComponentInterface {
 
 	compEntities := m.GetEntities([]string{name})
@@ -87,6 +87,25 @@ func (m ComponentManager) HasAll(id Entity, names ...string) bool {
 		}
 	}
 	return true
+}
+
+// DeleteEntity removes an entity and all it's components
+func (m *ComponentManager) DeleteEntity(id Entity) {
+	components := m.componentsByEntity[id]
+
+	delete(m.componentsByEntity, id)
+	for _, component := range components {
+		entities := m.entitiesByComponent[component.GetName()]
+		index := -1
+		for i, entity := range entities {
+			if entity == id {
+				index = i
+				break
+			}
+		}
+		m.entitiesByComponent[component.GetName()] =
+			append(entities[:index], entities[index+1])
+	}
 }
 
 func (m *ComponentManager) addToComponentsByEntity(
