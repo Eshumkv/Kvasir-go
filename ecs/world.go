@@ -3,6 +3,8 @@ package ecs
 import (
 	"sync"
 	"sync/atomic"
+
+	"github.com/Eshumkv/kvasir-go/utils"
 )
 
 var (
@@ -29,9 +31,9 @@ func NewWorld(allSystems []SystemInterface) World {
 
 // Create a new Entity.
 func (world *World) Create() Entity {
-	id := atomic.AddUint32(&idInc, 1)
-	entity := Entity(id)
+	entity := Entity(atomic.AddUint32(&idInc, 1))
 	world.em.Add(entity)
+	utils.DEBUG("Add entity", entity)
 
 	return entity
 }

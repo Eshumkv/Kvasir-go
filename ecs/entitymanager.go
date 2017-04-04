@@ -1,5 +1,7 @@
 package ecs
 
+import "fmt"
+
 // EntityManager manages the instances of the entities.
 type EntityManager struct {
 	entities map[Entity]bool
@@ -37,15 +39,21 @@ func (em *EntityManager) RemoveAllEntities() {
 
 // Process handles all entity updates.
 func (em *EntityManager) Process() {
-	for entity := range em.removed {
-		delete(em.entities, entity)
-		em.cm.DeleteEntity(entity)
+	if len(em.removed) != 0 {
+		for entity := range em.removed {
+			delete(em.entities, entity)
+			em.cm.DeleteEntity(entity)
+		}
+		em.removed = make(map[Entity]bool)
 	}
-	for entity := range em.added {
-		em.entities[entity] = true
+
+	if len(em.added) != 0 {
+		for entity := range em.added {
+			em.entities[entity] = true
+			fmt.Println(entity)
+		}
+		em.added = make(map[Entity]bool)
 	}
-	em.removed = make(map[Entity]bool)
-	em.added = make(map[Entity]bool)
 }
 
 // AddComponents adds components to an entity.

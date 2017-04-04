@@ -61,7 +61,8 @@ func main() {
 		systems.NewInputSystem(quitFunc, fullscreenFunc),
 		systems.NewRenderSystem(renderer),
 		systems.NewCameraSystem(window),
-		systems.NewSceneSystem(renderer)})
+		systems.NewSceneSystem(renderer),
+		systems.NewPlayerSystem()})
 	tempSystem := world.GetSystem("SceneSystem")
 	sceneSystem := tempSystem.(*systems.SceneSystem)
 	sceneSystem.SetFirstScene(scenes.NewMainMenuScene(), &world)

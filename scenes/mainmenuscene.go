@@ -20,6 +20,11 @@ func (scene MainMenuScene) Init(world *ecs.World) {
 		components.NewRenderComponent(200, 100, 50),
 		components.NewSpatialComponent(0, 0, 0, 50, 50),
 		components.NewCameraFollowComponent())
+
+	id = world.Create()
+	world.AddComponents(id,
+		components.NewRenderComponent(60, 100, 50),
+		components.NewSpatialComponent(-50, -50, 0, 50, 50))
 }
 
 func (scene MainMenuScene) Dispose(world *ecs.World) {
@@ -43,7 +48,6 @@ func (scene MainMenuScene) Update(world *ecs.World, dt float64) {
 	sceneSystem := tempSystem.(*systems.SceneSystem)
 
 	if inputSystem.IsKeyDown(systems.CommandShoot) {
-		world.ClearEntities()
 		sceneSystem.ChangeScene(NewTestScene2())
 	}
 }
