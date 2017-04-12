@@ -5,4 +5,5 @@ type SystemInterface interface {
 	Update(entities []Entity, world *World, dt float64)
 	GetComponentNames() []string
 	GetSystemName() string
+	GetIsConcurrent() bool
 }

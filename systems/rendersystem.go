@@ -88,6 +88,11 @@ func (system RenderSystem) GetSystemName() string {
 	return system.systemName
 }
 
+// GetIsConcurrent checks whether this system will run in a seperate thread.
+func (system RenderSystem) GetIsConcurrent() bool {
+	return false
+}
+
 // ByZ implements the sort interface for []ecs.Entity on Z value.
 type ByZ []*components.SpatialComponent
 

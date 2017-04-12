@@ -1,7 +1,5 @@
 package ecs
 
-import "fmt"
-
 // EntityManager manages the instances of the entities.
 type EntityManager struct {
 	entities map[Entity]bool
@@ -50,7 +48,6 @@ func (em *EntityManager) Process() {
 	if len(em.added) != 0 {
 		for entity := range em.added {
 			em.entities[entity] = true
-			fmt.Println(entity)
 		}
 		em.added = make(map[Entity]bool)
 	}

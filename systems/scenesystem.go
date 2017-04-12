@@ -58,6 +58,11 @@ func (system SceneSystem) GetSystemName() string {
 	return system.systemName
 }
 
+// GetIsConcurrent checks whether this system will run in a seperate thread.
+func (system SceneSystem) GetIsConcurrent() bool {
+	return true
+}
+
 // ChangeScene changes the scene at the next convenient moment.
 func (system *SceneSystem) ChangeScene(scene SceneInterface) {
 	system.nextScene = scene

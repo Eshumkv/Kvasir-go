@@ -57,6 +57,11 @@ func (system CameraSystem) GetSystemName() string {
 	return system.systemName
 }
 
+// GetIsConcurrent checks whether this system will run in a seperate thread.
+func (system CameraSystem) GetIsConcurrent() bool {
+	return true
+}
+
 // GetLocation gets the current location of the camera.
 func (system CameraSystem) GetLocation() (x, y int) {
 	return system.x, system.y
@@ -72,4 +77,15 @@ func (system *CameraSystem) GetScreenLocation(x, y int) (int, int) {
 	screenX := (x - system.x) + system.halfWidth
 	screenY := (y - system.y) + system.halfHeight
 	return int(screenX), int(screenY)
+}
+
+// GetMousePositionInWorld gets the mouse position translated to the world
+// coordinates.
+func (system CameraSystem) GetMousePositionInWorld(
+	mouseX, mouseY int) (int, int) {
+
+	relativeX := system.halfWidth - mouseX
+	relativeY := system.halfHeight - mouseY
+
+	return system.x - relativeX, system.y - relativeY
 }

@@ -20,6 +20,8 @@ func NewPlayerSystem() *PlayerSystem {
 	}
 }
 
+type position struct{ x, y int }
+
 // Update updates this system.
 func (system *PlayerSystem) Update(
 	entities []ecs.Entity, world *ecs.World, dt float64) {
@@ -28,35 +30,25 @@ func (system *PlayerSystem) Update(
 	s := world.GetSystem("InputSystem")
 	inputSystem := s.(*InputSystem)
 
+	s = world.GetSystem("CameraSystem")
+	camera := s.(*CameraSystem)
+
 	for _, comp := range players {
-		player := comp.(*components.PlayerComponent)
-		x := 0.0
-		y := 0.0
+		playerComponent := comp.(*components.PlayerComponent)
+		move(*playerComponent, dt, world, inputSystem)
 
-		if inputSystem.IsKeyDown(CommandLeft) {
-			x = -player.Speed * dt
-		}
-		if inputSystem.IsKeyDown(CommandRight) {
-			x = player.Speed * dt
-		}
+		// Shooting?
+		if inputSystem.IsKeyDown(CommandShoot) {
+			screenMouseX, screenMouseY := inputSystem.GetMousePosition()
+			mx, my := camera.GetMousePositionInWorld(screenMouseX, screenMouseY)
 
-		if inputSystem.IsKeyDown(CommandUp) {
-			y = -player.Speed * dt
-		}
-		if inputSystem.IsKeyDown(CommandDown) {
-			y = player.Speed * dt
+			// Shoot the bullet
+			entity := world.Create()
+			world.AddComponents(entity,
+				components.NewRenderComponent(255, 255, 255),
+				components.NewSpatialComponent(mx, my, 1, 10, 10))
 		}
 
-		if x != 0 || y != 0 {
-			c, err := world.GetComponent(player.GetEntityID(), "Spatial")
-			if err != nil {
-				continue
-			}
-			spatial := c.(*components.SpatialComponent)
-
-			spatial.X = int(float64(spatial.X) + x)
-			spatial.Y = int(float64(spatial.Y) + y)
-		}
 	}
 }
 
@@ -68,4 +60,41 @@ func (system PlayerSystem) GetComponentNames() []string {
 // GetSystemName returns the name of this system.
 func (system PlayerSystem) GetSystemName() string {
 	return system.systemName
+}
+
+// GetIsConcurrent checks whether this system will run in a seperate thread.
+func (system PlayerSystem) GetIsConcurrent() bool {
+	return true
+}
+
+func move(playerComponent components.PlayerComponent,
+	dt float64, world *ecs.World, inputSystem *InputSystem) {
+
+	x := 0.0
+	y := 0.0
+
+	if inputSystem.IsKeyDown(CommandLeft) {
+		x = -playerComponent.Speed * dt
+	}
+	if inputSystem.IsKeyDown(CommandRight) {
+		x = playerComponent.Speed * dt
+	}
+
+	if inputSystem.IsKeyDown(CommandUp) {
+		y = -playerComponent.Speed * dt
+	}
+	if inputSystem.IsKeyDown(CommandDown) {
+		y = playerComponent.Speed * dt
+	}
+
+	if x != 0 || y != 0 {
+		c, err := world.GetComponent(playerComponent.GetEntityID(), "Spatial")
+		if err != nil {
+			return
+		}
+		spatial := c.(*components.SpatialComponent)
+
+		spatial.X = int(float64(spatial.X) + x)
+		spatial.Y = int(float64(spatial.Y) + y)
+	}
 }

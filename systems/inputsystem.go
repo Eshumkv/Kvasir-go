@@ -12,6 +12,7 @@ type InputSystem struct {
 	quitDelegate       func()
 	fullscreenDelegate func()
 	systemName         string
+	mouseX, mouseY     int
 }
 
 // NewInputSystem creates a new InputSystem
@@ -21,13 +22,14 @@ func NewInputSystem(delegate func(), fullscreen func()) *InputSystem {
 		quitDelegate:       delegate,
 		fullscreenDelegate: fullscreen,
 		systemName:         "InputSystem",
+		mouseX:             0,
+		mouseY:             0,
 	}
 }
 
 // Update updates this system.
 func (system *InputSystem) Update(
 	entities []ecs.Entity, world *ecs.World, dt float64) {
-
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
@@ -41,6 +43,9 @@ func (system *InputSystem) Update(
 			}
 		case *sdl.KeyUpEvent:
 			system.commands[toCommand(t.Keysym.Sym)] = false
+		case *sdl.MouseMotionEvent:
+			system.mouseX = int(t.X)
+			system.mouseY = int(t.Y)
 		}
 	}
 }
@@ -77,9 +82,19 @@ func (system InputSystem) GetSystemName() string {
 	return system.systemName
 }
 
+// GetIsConcurrent checks whether this system will run in a seperate thread.
+func (system InputSystem) GetIsConcurrent() bool {
+	return false
+}
+
 // IsKeyDown checks if the specified key is down.
 func (system InputSystem) IsKeyDown(command Command) bool {
 	return system.commands[command]
+}
+
+// GetMousePosition returns the mouse position.
+func (system InputSystem) GetMousePosition() (x, y int) {
+	return system.mouseX, system.mouseY
 }
 
 //------------------------------------------------------------------------------

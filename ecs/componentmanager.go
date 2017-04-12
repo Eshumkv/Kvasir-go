@@ -2,8 +2,6 @@ package ecs
 
 import (
 	"errors"
-
-	"github.com/Eshumkv/kvasir-go/utils"
 )
 
 type componentList []ComponentInterface
@@ -30,8 +28,6 @@ func (m *ComponentManager) Add(
 	comp.SetEntityID(id)
 	m.addToComponentsByEntity(id, comp)
 	m.addToEntitiesByComponent(id, comp)
-	utils.DEBUG(comp.GetName(), ": ", m.entitiesByComponent[comp.GetName()])
-	utils.DEBUG(id, ":", m.componentsByEntity[id])
 
 	return comp
 }
