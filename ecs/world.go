@@ -3,8 +3,6 @@ package ecs
 import (
 	"sync"
 	"sync/atomic"
-
-	"github.com/eshumkv/Kvasir-go/utils"
 )
 
 var (
@@ -95,7 +93,6 @@ func (world *World) Update() {
 
 	world.lastFps = world.fps
 	world.fps = (world.lastFps * world.fpsSmooting) + ((1.0 / world.dt) * (1.0 - world.fpsSmooting))
-	utils.DEBUG(world.fps)
 }
 
 // GetSystem gets a system with a specific system.
@@ -127,11 +124,11 @@ func (world World) GetComponent(
 	return world.em.GetComponent(id, name)
 }
 
-// GetEntitiesByComponent gets all entities with that componentname (type).
-func (world World) GetEntitiesByComponent(
+// GetComponentsByName gets all components with that componentname (type).
+func (world World) GetComponentsByName(
 	name string) []ComponentInterface {
 
-	return world.em.GetEntitiesByComponent(name)
+	return world.em.GetComponentsByName(name)
 }
 
 // FPS returns the current frames per second

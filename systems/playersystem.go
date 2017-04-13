@@ -26,19 +26,34 @@ type position struct{ x, y int }
 func (system *PlayerSystem) Update(
 	entities []ecs.Entity, world *ecs.World, dt float64) {
 
-	players := world.GetEntitiesByComponent("Player")
 	s := world.GetSystem("InputSystem")
 	inputSystem := s.(*InputSystem)
 
 	s = world.GetSystem("CameraSystem")
 	camera := s.(*CameraSystem)
 
-	for _, comp := range players {
-		playerComponent := comp.(*components.PlayerComponent)
+	for _, entity := range entities {
+		t, err := world.GetComponent(entity, "Player")
+		if err != nil {
+			continue
+		}
+		playerComponent := t.(*components.PlayerComponent)
+
 		move(*playerComponent, dt, world, inputSystem)
 
+		if !playerComponent.CanShoot {
+			playerComponent.ShootTimer += dt
+
+			if playerComponent.ShootTimer >= playerComponent.ShootTimeout {
+				playerComponent.CanShoot = true
+				playerComponent.ShootTimer = 0
+			}
+		}
+
 		// Shooting?
-		if inputSystem.IsKeyDown(CommandShoot) {
+		if inputSystem.IsKeyDown(CommandShoot) &&
+			playerComponent.CanShoot {
+
 			screenMouseX, screenMouseY := inputSystem.GetMousePosition()
 			mx, my := camera.GetMousePositionInWorld(screenMouseX, screenMouseY)
 
@@ -46,9 +61,10 @@ func (system *PlayerSystem) Update(
 			entity := world.Create()
 			world.AddComponents(entity,
 				components.NewRenderComponent(255, 255, 255),
-				components.NewSpatialComponent(mx, my, 1, 10, 10))
+				components.NewSpatialComponent(mx, my, 1, 10, 10),
+				components.NewBulletComponent(mx, my))
+			playerComponent.CanShoot = false
 		}
-
 	}
 }
 

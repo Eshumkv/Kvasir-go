@@ -5,17 +5,22 @@ import (
 )
 
 type PlayerComponent struct {
-	name   string
-	active bool
-	entity ecs.Entity
-	Speed  float64
+	name         string
+	active       bool
+	entity       ecs.Entity
+	Speed        float64
+	ShootTimeout float64
+	ShootTimer   float64
+	CanShoot     bool
 }
 
 func NewPlayerComponent() *PlayerComponent {
 	return &PlayerComponent{
-		name:   "Player",
-		active: true,
-		Speed:  200,
+		name:         "Player",
+		active:       true,
+		Speed:        200,
+		ShootTimeout: 0.5,
+		CanShoot:     true,
 	}
 }
 

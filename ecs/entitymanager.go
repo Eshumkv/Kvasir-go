@@ -74,9 +74,9 @@ func (em EntityManager) GetComponent(
 	return em.cm.Get(id, name)
 }
 
-// GetEntitiesByComponent gets all entities with that componentname (type).
-func (em EntityManager) GetEntitiesByComponent(
+// GetComponentsByName gets all components with that componentname (type).
+func (em EntityManager) GetComponentsByName(
 	name string) []ComponentInterface {
 
-	return em.cm.GetEntitiesByComponent(name)
+	return em.cm.GetComponentsByName(name)
 }

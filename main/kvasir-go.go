@@ -55,7 +55,9 @@ func main() {
 		systems.NewRenderSystem(renderer),
 		systems.NewCameraSystem(window),
 		systems.NewSceneSystem(renderer),
-		systems.NewPlayerSystem()})
+		systems.NewPlayerSystem(),
+		systems.NewTimerSystem(),
+		systems.NewBulletSystem()})
 
 	tempSystem := world.GetSystem("SceneSystem")
 	sceneSystem := tempSystem.(*systems.SceneSystem)

@@ -54,18 +54,18 @@ func (m ComponentManager) GetEntities(names []string) []Entity {
 	return entities
 }
 
-// GetEntitiesByComponent gets all entities with that componentname (type).
-func (m ComponentManager) GetEntitiesByComponent(
+// GetComponentsByName gets all components with that componentname (type).
+func (m ComponentManager) GetComponentsByName(
 	name string) []ComponentInterface {
 
 	compEntities := m.GetEntities([]string{name})
-	entities := make(componentList, 0)
+	components := make(componentList, 0)
 	for _, entity := range compEntities {
 		if value, err := m.Get(entity, name); err == nil {
-			entities = append(entities, value)
+			components = append(components, value)
 		}
 	}
-	return entities
+	return components
 }
 
 // Has checks whether the entity has the given components.

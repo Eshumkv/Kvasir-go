@@ -65,7 +65,7 @@ func (system *RenderSystem) Update(
 func (system RenderSystem) getAndSortEntities(
 	world *ecs.World) []*components.SpatialComponent {
 
-	list := world.GetEntitiesByComponent("Spatial")
+	list := world.GetComponentsByName("Spatial")
 	zEntities := make([]*components.SpatialComponent, 0, len(list))
 	for _, item := range list {
 		c := item.(*components.SpatialComponent)
