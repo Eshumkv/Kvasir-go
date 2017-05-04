@@ -62,7 +62,7 @@ func (system *PlayerSystem) Update(
 			world.AddComponents(entity,
 				components.NewRenderComponent(255, 255, 255),
 				components.NewSpatialComponent(mx, my, 1, 10, 10),
-				components.NewBulletComponent(mx, my))
+				components.NewBulletComponent(mx, my, 200))
 			playerComponent.CanShoot = false
 		}
 	}

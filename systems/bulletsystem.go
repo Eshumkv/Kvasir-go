@@ -3,6 +3,7 @@ package systems
 import (
 	"github.com/Eshumkv/kvasir-go/components"
 	"github.com/Eshumkv/kvasir-go/ecs"
+	"github.com/Eshumkv/kvasir-go/utils"
 )
 
 //------------------------------------------------------------------------------
@@ -30,6 +31,7 @@ func (system *BulletSystem) Update(
 			continue
 		}
 		bullet := c.(*components.BulletComponent)
+		utils.NOP(bullet)
 	}
 }
 

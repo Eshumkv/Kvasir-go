@@ -8,3 +8,7 @@ import (
 func DEBUG(a ...interface{}) {
 	fmt.Println(a...)
 }
+
+// NOP is used to remove a warning from go.
+func NOP(a ...interface{}) {
+}
